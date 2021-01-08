@@ -321,6 +321,18 @@ Class AKFlickGestureRecognizer(){
 
 	return orig;
 }
+-(instancetype)initWithFrame:(CGRect)arg1 forCustomInputView:(BOOL)arg2 {
+	id orig = %orig;
+
+	if (orig){
+		SSPanGestureRecognizer *pan = [[SSPanGestureRecognizer alloc] initWithTarget:self action:@selector(SS_KeyboardGestureDidPan:)];
+		pan.cancelsTouchesInView = NO;
+		[self addGestureRecognizer:pan];
+		[pan release];
+	}
+
+	return orig;
+}
 
 %new
 -(void)SS_KeyboardGestureDidPan:(UIPanGestureRecognizer*)gesture{

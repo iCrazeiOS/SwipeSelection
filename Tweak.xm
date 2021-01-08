@@ -768,7 +768,8 @@ static BOOL shiftByOtherKey = NO;
 static BOOL isLongPressed = NO;
 static BOOL isDeleteKey = NO;
 static BOOL isMoreKey = NO;
-
+static BOOL g_deleteOnlyOnce;
+static int g_availableDeleteTimes;
 
 %hook UIKeyboardLayoutStar
 /*==============touchesBegan================*/
@@ -796,6 +797,8 @@ static BOOL isMoreKey = NO;
 	else {
 		isMoreKey = NO;
 	}
+
+	g_deleteOnlyOnce=NO;
 	
 	
 	%orig;
@@ -847,6 +850,8 @@ static BOOL isMoreKey = NO;
 	
 	// Delete key
 	if ([key isEqualToString:@"delete"] && !isLongPressed) {
+		g_deleteOnlyOnce = YES;
+		g_availableDeleteTimes = 1;
 		UIKeyboardImpl *kb = [UIKeyboardImpl activeInstance];
 		if ([kb respondsToSelector:@selector(handleDelete)]) {
 			[kb handleDelete];
@@ -914,12 +919,14 @@ static BOOL isMoreKey = NO;
 -(void)handleDeleteAsRepeat:(BOOL)repeat executionContext:(UIKeyboardTaskExecutionContext*)executionContext{
 	// Long press is simply meant to indicate if it's should repeat delete so repeat will do.
 	isLongPressed = repeat;
-	
-	if (!isLongPressed && isDeleteKey) {
+	if ((!isLongPressed && isDeleteKey)
+		|| (g_deleteOnlyOnce && g_availableDeleteTimes<=0)) {
 		[[executionContext executionQueue] finishExecution];
 		return;
 	}
 	
+	if(g_deleteOnlyOnce) g_availableDeleteTimes--;
+
 	%orig;
 }
 

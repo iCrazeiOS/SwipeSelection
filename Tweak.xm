@@ -224,6 +224,8 @@
 // Safari webview
 @interface WKContentView : UIView
 -(void)moveByOffset:(NSInteger)offset;
+-(id)_moveLeft:(BOOL)arg1 withHistory:(id)arg2 ;
+-(id)_moveRight:(BOOL)arg1 withHistory:(id)arg2 ;
 @end
 
 
@@ -258,6 +260,7 @@ UITextPosition *KH_tokenizerMovePositionWithGranularitInDirection(id <UITextInpu
 }
 
 BOOL KH_positionsSame(id <UITextInput, UITextInputTokenizer> tokenizer, UITextPosition *position1, UITextPosition *position2){
+	if([tokenizer isKindOfClass:[%c(WKContentView) class]]) return position1==position2;
 	return ([tokenizer comparePosition:position1 toPosition:position2] == NSOrderedSame);
 }
 
@@ -705,9 +708,15 @@ Class AKFlickGestureRecognizer(){
 			if (ABS(xOffset) >= xMinimum) {
 				BOOL positive = (xOffset > 0);
 				int offset = (ABS(xOffset) / xMinimum);
-				
+				BOOL isSelecting = pivotPoint!=_position;
+
 				for (int i = 0; i < offset; i++) {
-					[(WKContentView*)privateInputDelegate moveByOffset:(positive ? 1 : -1)];
+					if(positive){
+						[(WKContentView*)privateInputDelegate _moveRight:isSelecting withHistory:nil];
+					}
+					else{
+						[(WKContentView*)privateInputDelegate _moveLeft:isSelecting withHistory:nil];
+					}
 				}
 				
 				xOffset += (positive ? -(offset * xMinimum) : (offset * xMinimum));

@@ -319,7 +319,6 @@ Class AKFlickGestureRecognizer(){
 		SSPanGestureRecognizer *pan = [[SSPanGestureRecognizer alloc] initWithTarget:self action:@selector(SS_KeyboardGestureDidPan:)];
 		pan.cancelsTouchesInView = NO;
 		[self addGestureRecognizer:pan];
-		[pan release];
 	}
 
 	return orig;
@@ -331,7 +330,6 @@ Class AKFlickGestureRecognizer(){
 		SSPanGestureRecognizer *pan = [[SSPanGestureRecognizer alloc] initWithTarget:self action:@selector(SS_KeyboardGestureDidPan:)];
 		pan.cancelsTouchesInView = NO;
 		[self addGestureRecognizer:pan];
-		[pan release];
 	}
 
 	return orig;
@@ -500,15 +498,14 @@ Class AKFlickGestureRecognizer(){
 		realPreviousPosition = previousPosition;
 
 		if ([privateInputDelegate respondsToSelector:@selector(selectedTextRange)]) {
-			[startingtextRange release], startingtextRange = nil;
-			startingtextRange = [[privateInputDelegate selectedTextRange] retain];
+			startingtextRange = [privateInputDelegate selectedTextRange];
 		}
 	}
 	else if (gesture.state == UIGestureRecognizerStateChanged) {
 		UITextRange *currentRange = startingtextRange;
 		if ([privateInputDelegate respondsToSelector:@selector(selectedTextRange)]) {
 			currentRange = nil;
-			currentRange = [[[privateInputDelegate selectedTextRange] retain] autorelease];
+			currentRange = [privateInputDelegate selectedTextRange];
 		}
 
 		CGPoint position = [gesture locationInView:self];
@@ -579,12 +576,11 @@ Class AKFlickGestureRecognizer(){
 
 		// If this is the first run we are selecting then pick our pivot point
 		if (isFirstShiftDown) {
-			[pivotPoint release], pivotPoint = nil;
 			if (delta.x > 0 || delta.y < -20) {
-				pivotPoint = [positionStart retain];
+				pivotPoint = positionStart;
 			}
 			else {
-				pivotPoint = [positionEnd retain];
+				pivotPoint = positionEnd;
 			}
 		}
 		if (extendRange && pivotPoint) {
@@ -676,8 +672,7 @@ Class AKFlickGestureRecognizer(){
 		}
 
 		if (!extendRange && _position) {
-			[pivotPoint release], pivotPoint = nil;
-			pivotPoint = [_position retain];
+			pivotPoint = _position;
 		}
 
 		// Get a new text range

@@ -11,6 +11,7 @@ else
 endif
 
 TWEAK_NAME = SwipeSelection
+SwipeSelection_CFLAGS = -fobjc-arc
 SwipeSelection_FILES = Tweak.xm
 SwipeSelection_FRAMEWORKS = UIKit Foundation CoreGraphics
 

@@ -228,14 +228,17 @@
 -(id)_moveRight:(BOOL)arg1 withHistory:(id)arg2 ;
 @end
 
+@interface UIResponder()
+-(id)interactionAssistant;
+@end
 
+@interface UITextInteractionAssistant : NSObject
+-(id)selectionView;
+@end
 
-
-
-
-
-
-
+@interface UITextSelectionView
+- (void)showCalloutBarAfterDelay:(double)arg1;
+@end
 
 
 
@@ -442,30 +445,35 @@ Class AKFlickGestureRecognizer(){
 			if ([privateInputDelegate respondsToSelector:@selector(selectedTextRange)]) {
 				UITextRange *range = [privateInputDelegate selectedTextRange];
 				if (range && !range.empty) {
-					CGRect screenBounds = [UIScreen mainScreen].bounds;
-					CGRect rect = CGRectMake(screenBounds.size.width * 0.5, screenBounds.size.height * 0.5, 1, 1);
-					
-					if ([privateInputDelegate respondsToSelector:@selector(firstRectForRange:)]) {
-						rect = [privateInputDelegate firstRectForRange:range];
+					UITextInteractionAssistant *assistant = [(UIResponder*)privateInputDelegate interactionAssistant];
+					if(assistant){
+						[[assistant selectionView] showCalloutBarAfterDelay:0];
 					}
-					
-					UIView *view = nil;
-					if ([privateInputDelegate isKindOfClass:[UIView class]]) {
-						view = (UIView*)privateInputDelegate;
-					}
-					else if ([privateInputDelegate respondsToSelector:@selector(inputDelegate)]) {
-						id v = [keyboardImpl inputDelegate];
-						if (v != privateInputDelegate) {
-							if ([v isKindOfClass:[UIView class]]) {
-								view = (UIView*)v;
+					else{
+						CGRect screenBounds = [UIScreen mainScreen].bounds;
+						CGRect rect = CGRectMake(screenBounds.size.width * 0.5, screenBounds.size.height * 0.5, 1, 1);
+
+						if ([privateInputDelegate respondsToSelector:@selector(firstRectForRange:)]) {
+							rect = [privateInputDelegate firstRectForRange:range];
+						}
+
+						UIView *view = nil;
+						if ([privateInputDelegate isKindOfClass:[UIView class]]) {
+							view = (UIView*)privateInputDelegate;
+						}
+						else if ([privateInputDelegate respondsToSelector:@selector(inputDelegate)]) {
+							id v = [keyboardImpl inputDelegate];
+							if (v != privateInputDelegate) {
+								if ([v isKindOfClass:[UIView class]]) {
+									view = (UIView*)v;
+								}
 							}
 						}
+						// Should fix this to actually get the onscreen rect
+						UIMenuController *menu = [UIMenuController sharedMenuController];
+						[menu setTargetRect:rect inView:view];
+						[menu setMenuVisible:YES animated:YES];
 					}
-					
-					// Should fix this to actually get the onscreen rect
-					UIMenuController *menu = [UIMenuController sharedMenuController];
-					[menu setTargetRect:rect inView:view];
-					[menu setMenuVisible:YES animated:YES];
 				}
 			}
 			

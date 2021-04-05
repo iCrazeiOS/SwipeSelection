@@ -14,6 +14,8 @@ SwipeSelection_CFLAGS = -fobjc-arc
 SwipeSelection_FILES = Tweak.xm
 SwipeSelection_FRAMEWORKS = UIKit Foundation CoreGraphics
 
+ADDITIONAL_CFLAGS += -Wno-error=unused-variable -Wno-error=unused-function
+
 include $(THEOS)/makefiles/common.mk
 include $(THEOS_MAKE_PATH)/tweak.mk
 

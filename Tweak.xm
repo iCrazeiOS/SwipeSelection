@@ -163,6 +163,7 @@
 
 -(BOOL)SS_shouldSelect;
 -(BOOL)SS_disableSwipes;
+-(BOOL)SS_isKanaKey;
 -(BOOL)isShiftKeyBeingHeld;
 -(void)deleteAction;
 @end
@@ -356,6 +357,7 @@ Class AKFlickGestureRecognizer(){
 	static BOOL haveCheckedHand = NO;
 	static BOOL isFirstShiftDown = NO; // = first run of the code shift is held, then pick the pivot point
 	static BOOL isMoreKey = NO;
+	static BOOL isKanaKey = NO;
 	static int touchesWhenShiting = 0;
 	static BOOL cancelled = NO;
 
@@ -414,6 +416,10 @@ Class AKFlickGestureRecognizer(){
 		shiftHeldDown = [currentLayout SS_shouldSelect];
 		isFirstShiftDown = YES;
 		touchesWhenShiting = touchesCount;
+	}
+
+	if ([currentLayout respondsToSelector:@selector(SS_isKanaKey)]) {
+		isKanaKey = [currentLayout SS_isKanaKey];
 	}
 	
 	
@@ -496,7 +502,7 @@ Class AKFlickGestureRecognizer(){
 		touchesWhenShiting = 0;
 		gesture.cancelsTouchesInView = NO;
 	}
-	else if (longPress || handWriting || !privateInputDelegate || isMoreKey || cancelled) {
+	else if (longPress || handWriting || !privateInputDelegate || isMoreKey || isKanaKey || cancelled) {
 		return;
 	}
 	else if (gesture.state == UIGestureRecognizerStateBegan) {
@@ -780,8 +786,10 @@ static BOOL shiftByOtherKey = NO;
 static BOOL isLongPressed = NO;
 static BOOL isDeleteKey = NO;
 static BOOL isMoreKey = NO;
+static BOOL isKanaKey = NO;
 static BOOL g_deleteOnlyOnce;
 static int g_availableDeleteTimes;
+static NSSet<NSString*> *kanaKeys;
 
 %hook UIKeyboardLayoutStar
 /*==============touchesBegan================*/
@@ -808,6 +816,13 @@ static int g_availableDeleteTimes;
 	}
 	else {
 		isMoreKey = NO;
+	}
+
+	if ([kanaKeys containsObject:key]) {
+		isKanaKey = YES;
+	}
+	else {
+		isKanaKey = NO;
 	}
 
 	g_deleteOnlyOnce=NO;
@@ -898,10 +913,14 @@ static int g_availableDeleteTimes;
 	return ([self isShiftKeyBeingHeld] || shiftByOtherKey);
 }
 
-
 %new
 -(BOOL)SS_disableSwipes{
 	return isMoreKey;
+}
+
+%new
+-(BOOL)SS_isKanaKey{
+	return isKanaKey;
 }
 %end
 
@@ -946,4 +965,6 @@ static int g_availableDeleteTimes;
 //-(BOOL)handleKeyCommand:(id)arg1 repeatOkay:(BOOL*)arg2{ %log; return %orig; }
 %end
 
-
+%ctor{
+	kanaKeys = [NSSet setWithArray:@[@"あ",@"か",@"さ",@"た",@"な",@"は",@"ま",@"や",@"ら",@"わ",@"、"]];
+}

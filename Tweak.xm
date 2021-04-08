@@ -876,7 +876,7 @@ static NSSet<NSString*> *kanaKeys;
 	
 	
 	// Delete key
-	if ([key isEqualToString:@"delete"] && !isLongPressed) {
+	if ([key isEqualToString:@"delete"] && !isLongPressed && !isKanaKey) {
 		g_deleteOnlyOnce = YES;
 		g_availableDeleteTimes = 1;
 		UIKeyboardImpl *kb = [UIKeyboardImpl activeInstance];

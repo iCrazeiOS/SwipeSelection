@@ -152,6 +152,7 @@
 
 @interface UIKeyboardLayout : UIView
 -(UIKBKey*)keyHitTest:(CGPoint)point;
+-(long long)idiom;
 @end
 
 @interface UIKeyboardLayoutStar : UIKeyboardLayout
@@ -188,6 +189,11 @@
 // SwipeSelection
 -(void)_KHKeyboardGestureDidPan:(UIPanGestureRecognizer*)gesture;
 -(void)SS_revealSelection:(UIView*)inputView;
+
+@property (nonatomic,retain) id feedbackBehavior;//iOS 10
+@property (nonatomic,retain) id feedbackGenerator;//iOS11 12
+-(void)playKeyClickSound:(BOOL)arg1 ;// iOS 13
+-(void)playDeleteKeyFeedback:(BOOL)arg1 ;//iOS 14
 @end
 
 
@@ -242,8 +248,17 @@
 @end
 
 
+@interface UIDevice()
+-(void)_playSystemSound:(unsigned)arg1 ;
+@end
 
+@interface _UIKeyboardFeedbackGenerator : UIFeedbackGenerator
+-(void)_playFeedbackForActionType:(long long)arg1 withCustomization:(/*^block*/id)arg2 ;
+@end
 
+@interface _UIFeedbackKeyboardBehavior : UIFeedbackGenerator
+-(void)_playFeedbackForActionType:(long long)arg1 withCustomization:(/*^block*/id)arg2 ;
+@end
 
 #pragma mark - Helper functions
 
@@ -952,6 +967,20 @@ static NSSet<NSString*> *kanaKeys;
 	isLongPressed = repeat;
 	if ((!isLongPressed && isDeleteKey)
 		|| (g_deleteOnlyOnce && g_availableDeleteTimes<=0)) {
+		if([[self _layout] respondsToSelector:@selector(idiom)])
+		{
+			if([[self _layout] idiom] == 2){
+				[[UIDevice currentDevice] _playSystemSound:1123LL];
+			}
+			else{
+				if(@available(iOS 14.0, *))	[self playDeleteKeyFeedback:repeat];
+				else if(@available(iOS 13.0, *)) [self playKeyClickSound:repeat];
+				else if(@available(iOS 11.0, *)) [[self feedbackGenerator] _playFeedbackForActionType:3 withCustomization:nil];
+				else if(@available(iOS 10.0, *)){
+					[[self feedbackBehavior] _playFeedbackForActionType:3 withCustomization:nil];
+				}
+			}
+		}
 		[[executionContext executionQueue] finishExecution];
 		return;
 	}

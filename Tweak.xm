@@ -970,7 +970,7 @@ static NSSet<NSString*> *kanaKeys;
 		|| (g_deleteOnlyOnce && g_availableDeleteTimes<=0)) {
 		if([[self _layout] respondsToSelector:@selector(idiom)])
 		{
-			if([[self _layout] idiom] == 2){
+			if([(UIKeyboardLayout *)[self _layout] idiom] == 2){
 				[[UIDevice currentDevice] _playSystemSound:1123LL];
 			}
 			else{

@@ -26,6 +26,7 @@
 #import <UIKit/UITextInput.h>
 #import <UIKit/UIGestureRecognizerSubclass.h>
 #import <objc/runtime.h>
+#import <version.h>
 
 
 #pragma mark - Headers
@@ -973,10 +974,10 @@ static NSSet<NSString*> *kanaKeys;
 				[[UIDevice currentDevice] _playSystemSound:1123LL];
 			}
 			else{
-				if(@available(iOS 14.0, *))	[self playDeleteKeyFeedback:repeat];
-				else if(@available(iOS 13.0, *)) [self playKeyClickSound:repeat];
-				else if(@available(iOS 11.0, *)) [[self feedbackGenerator] _playFeedbackForActionType:3 withCustomization:nil];
-				else if(@available(iOS 10.0, *)){
+				if(IS_IOS_OR_NEWER(iOS_14_0))	[self playDeleteKeyFeedback:repeat];
+				else if(IS_IOS_OR_NEWER(iOS_13_0)) [self playKeyClickSound:repeat];
+				else if(IS_IOS_OR_NEWER(iOS_11_0)) [[self feedbackGenerator] _playFeedbackForActionType:3 withCustomization:nil];
+				else if(IS_IOS_OR_NEWER(iOS_10_0)){
 					[[self feedbackBehavior] _playFeedbackForActionType:3 withCustomization:nil];
 				}
 			}

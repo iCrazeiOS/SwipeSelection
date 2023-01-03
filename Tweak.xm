@@ -190,6 +190,7 @@
 // SwipeSelection
 -(void)_KHKeyboardGestureDidPan:(UIPanGestureRecognizer*)gesture;
 -(void)SS_revealSelection:(UIView*)inputView;
+@property (nonatomic,strong) UIPanGestureRecognizer *SS_pan;
 
 @property (nonatomic,retain) id feedbackBehavior;//iOS 10
 @property (nonatomic,retain) id feedbackGenerator;//iOS11 12
@@ -332,6 +333,8 @@ Class AKFlickGestureRecognizer(){
 #pragma mark - Hooks
 %hook UIKeyboardImpl
 
+%property (nonatomic,strong) UIPanGestureRecognizer *SS_pan;
+
 -(id)initWithFrame:(CGRect)rect{
 	id orig = %orig;
 
@@ -339,6 +342,7 @@ Class AKFlickGestureRecognizer(){
 		SSPanGestureRecognizer *pan = [[SSPanGestureRecognizer alloc] initWithTarget:self action:@selector(SS_KeyboardGestureDidPan:)];
 		pan.cancelsTouchesInView = NO;
 		[self addGestureRecognizer:pan];
+		[self setSS_pan:pan];
 	}
 
 	return orig;
@@ -350,6 +354,7 @@ Class AKFlickGestureRecognizer(){
 		SSPanGestureRecognizer *pan = [[SSPanGestureRecognizer alloc] initWithTarget:self action:@selector(SS_KeyboardGestureDidPan:)];
 		pan.cancelsTouchesInView = NO;
 		[self addGestureRecognizer:pan];
+		[self setSS_pan:pan];
 	}
 
 	return orig;
@@ -994,6 +999,17 @@ static NSSet<NSString*> *kanaKeys;
 
 //-(BOOL)handleKeyCommand:(id)arg1 repeatOkay:(BOOL*)arg2{ %log; return %orig; }
 %end
+
+@interface _UIKeyboardTextSelectionInteraction
+- (id)owner;
+@end
+%hook _UIKeyboardTextSelectionInteraction
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer{
+    id delegate = [[self owner] delegate];
+    if([delegate respondsToSelector:@selector(SS_pan)] && [[delegate SS_pan] state] == UIGestureRecognizerStateChanged) return NO;
+    return %orig;
+}
+%end //_UIKeyboardTextSelectionInteraction
 
 %ctor{
 	kanaKeys = [NSSet setWithArray:@[@"あ",@"か",@"さ",@"た",@"な",@"は",@"ま",@"や",@"ら",@"わ",@"、"]];

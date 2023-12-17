@@ -713,7 +713,12 @@ Class AKFlickGestureRecognizer(){
 		// Get a new text range
 		UITextRange *textRange = startingtextRange = nil;
 		if ([privateInputDelegate respondsToSelector:@selector(textRangeFromPosition:toPosition:)]) {
-			textRange = [privateInputDelegate textRangeFromPosition:pivotPoint toPosition:_position];
+			if([privateInputDelegate comparePosition:_position toPosition:pivotPoint] == NSOrderedAscending){
+				textRange = [privateInputDelegate textRangeFromPosition:_position toPosition:pivotPoint];
+			}
+			else{
+				textRange = [privateInputDelegate textRangeFromPosition:pivotPoint toPosition:_position];
+			}
 		}
 
 		CGPoint oldPrevious = previousPosition;

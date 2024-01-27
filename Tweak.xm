@@ -538,8 +538,10 @@
 
 
 %ctor {
-	NSString *path = [[[NSProcessInfo processInfo] arguments] firstObject];
-	if ([path containsString:@"/Application"] || [path containsString:@"SpringBoard.app"]) {
+	NSString *path = [[NSProcessInfo processInfo] arguments][0];
+	BOOL isApp = [path rangeOfString:@"/Application"].location != NSNotFound;
+	BOOL isSpringBoard = [path rangeOfString:@"SpringBoard.app"].location != NSNotFound;
+	if (isApp || isSpringBoard) {
 		kanaKeys = [NSSet setWithArray:@[@"あ",@"か",@"さ",@"た",@"な",@"は",@"ま",@"や",@"ら",@"わ",@"、"]];
 		%init;
 	}

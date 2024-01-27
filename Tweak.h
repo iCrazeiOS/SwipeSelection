@@ -178,11 +178,11 @@
 -(void)_playSystemSound:(unsigned)arg1;
 @end
 
-@interface _UIKeyboardFeedbackGenerator : UIFeedbackGenerator
+@interface _UIKeyboardFeedbackGenerator : NSObject
 -(void)_playFeedbackForActionType:(long long)arg1 withCustomization:(id)arg2;
 @end
 
-@interface _UIFeedbackKeyboardBehavior : UIFeedbackGenerator
+@interface _UIFeedbackKeyboardBehavior : NSObject
 -(void)_playFeedbackForActionType:(long long)arg1 withCustomization:(id)arg2;
 @end
 
@@ -209,4 +209,4 @@ static BOOL isMoreKey = NO;
 static BOOL isKanaKey = NO;
 static BOOL g_deleteOnlyOnce;
 static int g_availableDeleteTimes;
-static NSSet<NSString *> *kanaKeys;
+static NSSet *kanaKeys;

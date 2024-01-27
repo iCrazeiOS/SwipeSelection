@@ -196,6 +196,7 @@
 @property (nonatomic,retain) id feedbackGenerator;//iOS11 12
 -(void)playKeyClickSound:(BOOL)arg1 ;// iOS 13
 -(void)playDeleteKeyFeedback:(BOOL)arg1 ;//iOS 14
+-(void)playDeleteKeyFeedbackRepeat:(BOOL)arg1 rapid:(BOOL)arg2 ;//iOS 16
 @end
 
 
@@ -984,7 +985,8 @@ static NSSet<NSString*> *kanaKeys;
 				[[UIDevice currentDevice] _playSystemSound:1123LL];
 			}
 			else{
-				if(IS_IOS_OR_NEWER(iOS_14_0))	[self playDeleteKeyFeedback:repeat];
+				if(IS_IOS_OR_NEWER(iOS_16_0)) [self playDeleteKeyFeedbackRepeat:repeat rapid:NO];
+				else if(IS_IOS_OR_NEWER(iOS_14_0)) [self playDeleteKeyFeedback:repeat];
 				else if(IS_IOS_OR_NEWER(iOS_13_0)) [self playKeyClickSound:repeat];
 				else if(IS_IOS_OR_NEWER(iOS_11_0)) [[self feedbackGenerator] _playFeedbackForActionType:3 withCustomization:nil];
 				else if(IS_IOS_OR_NEWER(iOS_10_0)){

@@ -1016,6 +1016,10 @@ static NSSet<NSString*> *kanaKeys;
 }
 %end //_UIKeyboardTextSelectionInteraction
 
-%ctor{
-	kanaKeys = [NSSet setWithArray:@[@"あ",@"か",@"さ",@"た",@"な",@"は",@"ま",@"や",@"ら",@"わ",@"、"]];
+%ctor {
+	NSString *path = [[[NSProcessInfo processInfo] arguments] firstObject];
+	if ([path containsString:@"/Application"] || [path containsString:@"SpringBoard.app"]) {
+		kanaKeys = [NSSet setWithArray:@[@"あ",@"か",@"さ",@"た",@"な",@"は",@"ま",@"や",@"ら",@"わ",@"、"]];
+		%init;
+	}
 }

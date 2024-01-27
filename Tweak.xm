@@ -265,7 +265,7 @@
 
 #pragma mark - Helper functions
 
-UITextPosition *KH_MovePositionDirection(id <UITextInput, UITextInputTokenizer> tokenizer, UITextPosition *startPosition, UITextDirection direction){
+UITextPosition *KH_MovePositionDirection(id <UITextInput, UITextInputTokenizer> tokenizer, UITextPosition *startPosition, UITextLayoutDirection direction){
 	if (tokenizer && startPosition) {
 		return [tokenizer positionFromPosition:startPosition inDirection:direction offset:1];
 	}
@@ -666,7 +666,7 @@ Class AKFlickGestureRecognizer(){
 				if (granularity == UITextGranularityCharacter &&
 					[tokenizer respondsToSelector:@selector(positionFromPosition:inDirection:offset:)] &&
 					NO) {
-					_position = KH_MovePositionDirection(tokenizer, _position, textDirection);
+					_position = KH_MovePositionDirection(tokenizer, _position, (UITextLayoutDirection)textDirection);
 				}
 				else {
 					_position = KH_tokenizerMovePositionWithGranularitInDirection(tokenizer, _position, granularity, textDirection);
